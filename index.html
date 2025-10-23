@@ -3,7 +3,7 @@
 <head>
 <meta charset='utf-8' />
 <meta name='viewport' content='width=device-width,initial-scale=1' />
-<title>AdamMM Music.ro</title>
+<title>AdamMM Music</title>
 <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap' rel='stylesheet'>
 <style>
 :root{
@@ -263,6 +263,27 @@ header{
     color:#fff
 }
 
+/* Video placeholder */
+.video-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+}
+.video-placeholder i {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: var(--red-accent);
+}
+
 /* responsive */
 @media(max-width:900px){
     .video-shell{grid-template-columns:1fr}
@@ -284,7 +305,7 @@ header{
 <body>
 <header>
   <div class='logo-row'>
-    <img src='channels4_profile.jpg' alt='logo' class='logo-img'>
+    <img src='channels4_profile.jpg' alt='AdamMM Music Logo' class='logo-img'>
     <div>
       <div class='logo-text logo-glow'>AdamMM Music</div>
       <div style='color:var(--muted);font-size:13px'>Beaturi și melodii originale</div>
@@ -306,7 +327,7 @@ header{
     <div class='video-shell'>
       <div>
         <div class='player-frame'>
-            <iframe id='featured-video' src='' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen title='Player'></iframe>
+            <iframe id='featured-video' src='' allow='accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen title='Player'></iframe>
         </div>
         <div class='video-meta' id='featured-meta'>Selectează un videoclip din lista din dreapta.</div>
       </div>
@@ -515,8 +536,9 @@ function renderVideos(list){
 }
 
 function setFeatured(v){
+    // Încarcă videoclipul FĂRĂ autoplay
     const iframe = document.getElementById('featured-video');
-    iframe.src = `https://www.youtube.com/embed/${v.embedId}?rel=0&autoplay=1&controls=1&modestbranding=1`;
+    iframe.src = `https://www.youtube.com/embed/${v.embedId}?rel=0&controls=1&modestbranding=1`;
     document.getElementById('featured-meta').textContent = `${v.title} — ${v.views} • ${v.date}`;
     document.querySelector('.player-frame').scrollIntoView({behavior:'smooth'});
 }
@@ -550,9 +572,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     renderSongs();
     renderVideos(VIDEOS);
     if(VIDEOS.length){
-        // Autoplay pentru "Iubirea mea ❤️" - primul videoclip
+        // Încarcă primul videoclip FĂRĂ autoplay
         const first = VIDEOS[0];
-        document.getElementById('featured-video').src = `https://www.youtube.com/embed/${first.embedId}?rel=0&autoplay=1&controls=1&modestbranding=1`;
+        document.getElementById('featured-video').src = `https://www.youtube.com/embed/${first.embedId}?rel=0&controls=1&modestbranding=1`;
         document.getElementById('featured-meta').textContent = `${first.title} — ${first.views} • ${first.date}`;
     }
     
