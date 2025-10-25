@@ -115,7 +115,11 @@ footer{position:relative;z-index:3;background:rgba(0,0,0,0.65);color:var(--muted
             <div class="yt-grid">
                 <div class="video-player" id="video-player">
                     <div class="player-frame">
-                        <iframe id="featured-video" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Video player"></iframe>
+                        
+<div id="next-overlay" style="position:absolute;bottom:12%;right:4%;background:linear-gradient(90deg,#ff3b3b,#cc2a2a);color:#fff;padding:12px 20px;border-radius:16px;font-weight:900;cursor:pointer;font-size:15px;opacity:0;transition:opacity .4s, transform .4s;transform:translateY(18px);z-index:5;display:flex;align-items:center;gap:8px;box-shadow:0 0 22px rgba(255,60,60,0.5);">
+ NEXT ››
+</div>
+<iframe id="featured-video" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Video player"></iframe>
                     </div>
                     <div class="video-meta">
                         <h2 id="featured-title" class="video-title">Videoclip selectat</h2>
@@ -280,28 +284,50 @@ document.addEventListener('DOMContentLoaded',()=>{const musicList=document.getEl
 <script>
 let ytPlayer;
 let currentVideoIndex = 0;
-
 function onYouTubeIframeAPIReady(){
-    ytPlayer = new YT.Player('featured-video', {
-        events:{'onStateChange': onPlayerStateChange}
-    });
+  ytPlayer = new YT.Player('featured-video',{events:{'onStateChange': onPlayerStateChange}});
 }
-
-function onPlayerStateChange(event){
-    if(event.data === YT.PlayerState.ENDED){
-        currentVideoIndex++;
-        if(currentVideoIndex < youtubeVideos.length){
-            const next = youtubeVideos[currentVideoIndex];
-            origSet(next.embedId,next.title,next.desc,next.views,next.date);
-        }
-    }
-}
-
 const origSet = setFeaturedVideo;
 setFeaturedVideo = function(e,t,d,v,da){
-    currentVideoIndex = youtubeVideos.findIndex(x=>x.embedId===e);
-    origSet(e,t,d,v,da);
+  currentVideoIndex = youtubeVideos.findIndex(x=>x.embedId===e);
+  origSet(e,t,d,v,da);
 };
+function onPlayerStateChange(event){
+  if(event.data === YT.PlayerState.ENDED){
+    hideNextButton();
+    currentVideoIndex++;
+    if(currentVideoIndex < youtubeVideos.length){
+      const next = youtubeVideos[currentVideoIndex];
+      origSet(next.embedId,next.title,next.desc,next.views,next.date);
+    }
+  }
+  if(event.data === YT.PlayerState.PLAYING){
+    const check = setInterval(()=>{
+      if(event.data!==YT.PlayerState.PLAYING) return clearInterval(check);
+      const rem = ytPlayer.getDuration()-ytPlayer.getCurrentTime();
+      if(rem<10) showNextButton(); else hideNextButton();
+    },1000);
+  }
+}
+function showNextButton(){
+  const b=document.getElementById('next-overlay');
+  if(b){b.style.opacity=1;b.style.transform='translateY(0)';}
+}
+function hideNextButton(){
+  const b=document.getElementById('next-overlay');
+  if(b){b.style.opacity=0;b.style.transform='translateY(18px)';}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const b=document.getElementById('next-overlay');
+  if(b) b.onclick=()=>{
+    hideNextButton();
+    currentVideoIndex++;
+    if(currentVideoIndex < youtubeVideos.length){
+      const next = youtubeVideos[currentVideoIndex];
+      origSet(next.embedId,next.title,next.desc,next.views,next.date);
+    }
+  };
+});
 </script>
 
 </body>
