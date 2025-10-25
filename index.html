@@ -216,7 +216,7 @@ const songs = [
 { id: 'audio48', title: 'Blestem pentru o mincinoasă', image: 'Euyt.jpg', audio: 'Blestem pentru o mincinoasă.mp3' }
 ];
 const youtubeVideos = [
-{ title: 'Suferinta', embedId: '7ryWXKKp1Ig', views: '2 vizionări', date: 'acum 5 ore', desc: 'Videoclip nou - Iubirea mea ❤️ (visual)' },
+{ title: 'Suferinta', embedId: '7ryWXKKp1Ig', views: '2 vizionări', date: 'acum 5 ore', desc: 'Videoclip nou - Suferinta' },
 { title: 'Demonii rând', embedId: 'Dk2byULdVMk', views: '26 vizionări', date: 'acum 2 săptămâni', desc: 'Videoclip nou - Demonii rând' },
 { title: 'Antidot (visual)', embedId: 'qfzWXK9NQ0c', views: '199 vizionări', date: 'acum 6 luni', desc: 'Clip oficial - Antidot (visual)' },
 { title: 'Din Mii (visual)', embedId: 'o8tgRX2xSZs', views: '233 vizionări', date: 'acum 7 luni', desc: 'Acustic session - Din Mii (visual)' },
@@ -275,5 +275,34 @@ document.getElementById('desc-toggle').addEventListener('click',()=>{const desc=
 document.getElementById('subscribe-btn').addEventListener('click',()=>{const b=document.getElementById('subscribe-btn');b.textContent = b.textContent==='Abonează-te' ? 'Abonat' : 'Abonează-te';b.style.background = b.textContent==='Abonat' ? 'rgba(255,255,255,0.06)' : '';playClick()})
 document.addEventListener('DOMContentLoaded',()=>{const musicList=document.getElementById('music-list');const suggestions=document.getElementById('suggestions');if(musicList) musicList.innerHTML = songs.map(createSongCard).join('');if(suggestions) suggestions.innerHTML = youtubeVideos.map(createSuggestItem).join('');if(youtubeVideos.length){const first = youtubeVideos[0];const iframe=document.getElementById('featured-video');if(iframe) iframe.src = `https://www.youtube.com/embed/${first.embedId}?rel=0&controls=1&modestbranding=1`;document.getElementById('featured-title').textContent = first.title;document.getElementById('featured-desc').textContent = first.desc||'';document.getElementById('featured-views').textContent = first.views;document.getElementById('featured-date').textContent = first.date;}document.querySelectorAll('.suggest-item').forEach(item=>{item.addEventListener('keydown',(e)=>{if(e.key==='Enter' || e.key===' '){item.click();e.preventDefault();}})});['click','keydown','touchstart'].forEach(ev=>{window.addEventListener(ev,function firstTouch(){playIntroOnce();['click','keydown','touchstart'].forEach(k=>window.removeEventListener(k, firstTouch));},{once:true,passive:true})});});
 </script>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+let ytPlayer;
+let currentVideoIndex = 0;
+
+function onYouTubeIframeAPIReady(){
+    ytPlayer = new YT.Player('featured-video', {
+        events:{'onStateChange': onPlayerStateChange}
+    });
+}
+
+function onPlayerStateChange(event){
+    if(event.data === YT.PlayerState.ENDED){
+        currentVideoIndex++;
+        if(currentVideoIndex < youtubeVideos.length){
+            const next = youtubeVideos[currentVideoIndex];
+            origSet(next.embedId,next.title,next.desc,next.views,next.date);
+        }
+    }
+}
+
+const origSet = setFeaturedVideo;
+setFeaturedVideo = function(e,t,d,v,da){
+    currentVideoIndex = youtubeVideos.findIndex(x=>x.embedId===e);
+    origSet(e,t,d,v,da);
+};
+</script>
+
 </body>
 </html>
